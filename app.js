@@ -20,10 +20,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose.connect('mongodb://localhost:27017/NNPTUD-C2');
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/NNPTUD-C2';
+mongoose.connect(MONGODB_URI);
 mongoose.connection.on('connected', () => {
-  console.log("connected");
-})
+  console.log("MongoDB connected");
+});
+mongoose.connection.on('error', (err) => {
+  console.error("MongoDB error:", err.message);
+  console.log("Nếu dùng MongoDB Atlas: thêm MONGODB_URI vào .env");
+  console.log("Nếu dùng MongoDB local: đảm bảo đã chạy 'mongod'");
+});
 
 app.use('/api/v1/', require('./routes/index'));
 app.use('/api/v1/users', require('./routes/users'));
